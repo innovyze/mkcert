@@ -23,7 +23,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -51,10 +50,11 @@ func (m *mkcert) makeCert(hosts []string) {
 	pub := priv.(crypto.Signer).Public()
 
 	tpl := &x509.Certificate{
-		SerialNumber: randomSerialNumber(),
+		SerialNumber:   randomSerialNumber(),
+		EmailAddresses: []string{"support@innovyze.com"},
 		Subject: pkix.Name{
-			Organization:       []string{"mkcert development certificate"},
-			OrganizationalUnit: []string{userAndHostname},
+			Organization:       []string{"Innovyze"},
+			OrganizationalUnit: []string{hosts[0]},
 		},
 
 		NotAfter:  time.Now().AddDate(10, 0, 0),
@@ -145,18 +145,18 @@ func (m *mkcert) generateKey(rootCA bool) (crypto.PrivateKey, error) {
 func (m *mkcert) fileNames(hosts []string) (certFile, keyFile, p12File string) {
 	defaultName := strings.Replace(hosts[0], ":", "_", -1)
 	defaultName = strings.Replace(defaultName, "*", "_wildcard", -1)
-	if len(hosts) > 1 {
-		defaultName += "+" + strconv.Itoa(len(hosts)-1)
-	}
+	// if len(hosts) > 1 {
+	// 	defaultName += "+" + strconv.Itoa(len(hosts)-1)
+	// }
 	if m.client {
 		defaultName += "-client"
 	}
 
-	certFile = "./" + defaultName + ".pem"
+	certFile = "./" + defaultName + ".crt"
 	if m.certFile != "" {
 		certFile = m.certFile
 	}
-	keyFile = "./" + defaultName + "-key.pem"
+	keyFile = "./" + defaultName + ".key"
 	if m.keyFile != "" {
 		keyFile = m.keyFile
 	}
@@ -283,15 +283,16 @@ func (m *mkcert) newCA() {
 	skid := sha1.Sum(spki.SubjectPublicKey.Bytes)
 
 	tpl := &x509.Certificate{
-		SerialNumber: randomSerialNumber(),
+		SerialNumber:   randomSerialNumber(),
+		EmailAddresses: []string{"support@innovyze.com"},
 		Subject: pkix.Name{
-			Organization:       []string{"mkcert development CA"},
-			OrganizationalUnit: []string{userAndHostname},
+			Organization:       []string{"Innovyze"},
+			OrganizationalUnit: []string{"R&D"},
 
 			// The CommonName is required by iOS to show the certificate in the
 			// "Certificate Trust Settings" menu.
 			// https://github.com/FiloSottile/mkcert/issues/47
-			CommonName: "mkcert " + userAndHostname,
+			CommonName: "InfoWorksWeb Root CA",
 		},
 		SubjectKeyId: skid[:],
 

@@ -121,8 +121,8 @@ func main() {
 	}).Run(flag.Args())
 }
 
-const rootName = "rootCA.pem"
-const rootKeyName = "rootCA-key.pem"
+const rootName = "InfoWorksWeb Root CA.crt"
+const rootKeyName = "InfoWorksWeb Root CA.key"
 
 type mkcert struct {
 	installMode, uninstallMode bool
